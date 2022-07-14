@@ -237,7 +237,7 @@ function fire(player) {
     for (i = 0; i >= 0; i++) {
         if (!bullets[i].isAlive) {
             bullNum = i;
-            bullets[i + 1] = {isAlive: false};
+            bullets[Object.keys(bullets).length] = {isAlive: false};
             break;
         }
     }
