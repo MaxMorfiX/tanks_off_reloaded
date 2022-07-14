@@ -5,13 +5,14 @@ var field = $('#field');
 var playerSize = $('.player').innerWidth();
 var bulletSize = $('.bullet').innerWidth();
 var playPlayers = 3;
+var lastBulletId = 0;
 
 $('#divForBulletSize').remove();
 
 var timeBetweenBullets = 500;
 var gamespeed = 15;
 var buttons = {};
-var bullets = {0: {isAlive: false}};
+var bullets = [];
 var players = {
     1: {x: 0, y: 0, ang: 0, lastFire: timeBetweenBullets, lives: 10, score: 0},
     2: {x: 0, y: 0, ang: 180, lastFire: timeBetweenBullets, lives: 10, score: 0},
@@ -50,13 +51,11 @@ function cycle() {
 }
 
 function moveBullets() {
-    for (i = 0; i < Object.keys(bullets).length; i++) {
-        if (!bullets[i].isAlive) {
-            continue;
-        }
-        var ret = $('#bull' + i).moveByVec(bullets[i].ang, bulletSpeed);
-        bullets[i]['x'] = ret.finX;
-        bullets[i]['y'] = ret.finY;
+    for (i = 0; i < bullets.length; i++) {
+        var bullet = bullets[i];
+        var ret = $('#bull' + bullet.id).moveByVec(bullet.ang, bulletSpeed);
+        bullet.x = ret.finX;
+        bullet.y = ret.finY;
     }
 }
 
@@ -65,13 +64,9 @@ function hitboxCheck() {
 
         var player = players[j];
 
-        for (i = 0; i < Object.keys(bullets).length; i++) {
+        for (i = 0; i < bullets.length; i++) {
 
             var bullet = bullets[i];
-
-            if (!bullet.isAlive) {
-                continue;
-            }
 
             if (bullet.player === j) {
                 continue;
@@ -83,9 +78,12 @@ function hitboxCheck() {
 
                 console.log(bullet.player + '`s player bullet hit in ' + j + ' player');
 
-                bullet.isAlive = false;
-
-                $('#bull' + i).remove();
+                $('#bull' + bullet.id).remove();
+                bullets.splice(i, 1);
+                // yep, this works as (i < bullets.length) condition is recalculated each loop.
+                // or we may just iterate backwards:
+                // for (i = bullets.length-1; i >= 0; i--) {
+                i--;
             }
         }
     }
@@ -232,28 +230,23 @@ function checkButtons() {
 
 function fire(player) {
 
-    var bullNum = 0;
+    var newBullet = {};
+    newBullet.ang = players[player].ang;
+    newBullet.player = player;
+    newBullet.id = ++lastBulletId;
+    newBullet.x = players[player].x + playerSize / 2 - bulletSize / 2;
+    newBullet.y = players[player].y + playerSize / 2 - bulletSize / 2;
 
-    for (i = 0; i >= 0; i++) {
-        if (!bullets[i].isAlive) {
-            bullNum = i;
-            bullets[Object.keys(bullets).length] = {isAlive: false};
-            break;
-        }
-    }
+    create('bullet', newBullet);
 
-    create('bullet', players[player].x + playerSize / 2 - bulletSize / 2, players[player].y + playerSize / 2 - bulletSize / 2, bullNum);
-    bullets[bullNum].ang = players[player].ang;
-    bullets[bullNum].player = player;
-    bullets[bullNum].isAlive = true;
+    bullets.push(newBullet);
 
-    $('#bull' + (bullNum)).moveByVec(players[player].ang, playerSize * 0.45);
+    $('#bull' + (newBullet.id)).moveByVec(players[player].ang, playerSize * 0.45);
 }
 
-function create(type, x, y, bullNum) {
+function create(type, newBullet) {
     if (type === 'bullet') {
-        bullets[bullNum] = {x: x, y: y};
-        var html = `<div id='bull${bullNum}' class='bullet' style='left: ${x}px; bottom: ${y}px'></div>`;
+        var html = `<div id='bull${newBullet.id}' class='bullet' style='left: ${newBullet.x}px; bottom: ${newBullet.y}px'></div>`;
     }
     field.append(html);
 }
