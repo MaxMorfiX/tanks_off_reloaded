@@ -234,7 +234,7 @@ function fire(player) {
 
     var bullNum = 0;
 
-    for (i = 0; i => 0; i++) {
+    for (i = 0; i >= 0; i++) {
         if (!bullets[i].isAlive) {
             bullNum = i;
             bullets[i + 1] = {isAlive: false};
