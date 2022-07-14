@@ -1,0 +1,39 @@
+.field {
+    position: relative;
+    width: 500px;
+    height: 300px;
+    border: none;
+    color: gray;
+    background-color: gray;
+    z-index: 0;
+    display: block;
+}
+.player {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background: url('textures/p1.png');
+    background-size: 100% 100% !important;
+    display: block;
+}
+.bullet {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: url('textures/bullet.png');
+    background-size: 100% 100% !important;
+    display: block;
+    
+}
+#p2 {
+    background: url('textures/p2.png');
+    transform: rotate(180deg);
+}
+#p3 {
+    background: url('textures/p3.png');
+}
+#p4 {
+    background: url('textures/p4.png');
+    transform: rotate(180deg);
+    display: none;
+}
