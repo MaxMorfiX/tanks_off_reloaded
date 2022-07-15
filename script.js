@@ -62,6 +62,12 @@ function moveBullets() {
 }
 
 function hitboxCheck() {
+    bulletsPlayersColCheck();
+    
+    bulletsWallColCheck();
+}
+
+function bulletsPlayersColCheck() {
     for (j = 1; j <= playPlayers; j++) {
 
         var player = players[j];
@@ -87,6 +93,21 @@ function hitboxCheck() {
                 // for (i = bullets.length-1; i >= 0; i--) {
                 i--;
             }
+        }
+    }
+}
+
+function bulletsWallColCheck() {
+    for (i = 0; i < bullets.length; i++) {
+
+        var bullet = bullets[i];
+        
+        if(bullet.x <= 0 || bullet.x >= fieldWidth - bulletSize) {
+            $('#bull' + bullet.id).remove();
+            bullets.splice(i, 1);
+        } else if(bullet.y <= 0 || bullet.y >= fieldHeight - bulletSize) {
+            $('#bull' + bullet.id).remove();
+            bullets.splice(i, 1);
         }
     }
 }
