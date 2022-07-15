@@ -46,7 +46,7 @@ function fitToSizeJQbottom() {
 })(jQuery);
 
 (function($) {
-    $.fn.moveByVec = function(ang, shift, angType, fMove) {
+    $.fn.moveByVec = function(ang, shift, fDontMove, angType) {
     
     if(angType !== 'rad') {
         ang = dToR(ang);
@@ -60,9 +60,9 @@ function fitToSizeJQbottom() {
     var finX = obj.x() + xAdd;
     var finY = obj.y() + yAdd;
     
+    if(!fDontMove) {
         obj.x(finX);
         obj.y(finY);
-    if(fMove) {
     }
     
     var ret = {xAdd, yAdd, finX, finY};

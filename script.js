@@ -2,6 +2,8 @@ const SEP = '_';
 var playerSpeed = 3;
 var bulletSpeed = playerSpeed * 3;
 var field = $('#field');
+var fieldHeight = field.height();
+var fieldWidth = field.width();
 var playerSize = $('.player').innerWidth();
 var bulletSize = $('.bullet').innerWidth();
 var playPlayers = 3;
@@ -154,44 +156,28 @@ function checkButtons() {
 
     function checkMoveButtons() {
         if (buttons[40]) {
-            var ret = $('#p1').moveByVec(players[1].ang + 180, playerSpeed);
-            players[1]['x'] = ret.finX;
-            players[1]['y'] = ret.finY;
+            moveOnePlayer(1, players[1].ang + 180);
         }
         if (buttons[38]) {
-            var ret = $('#p1').moveByVec(players[1].ang, playerSpeed);
-            players[1]['x'] = ret.finX;
-            players[1]['y'] = ret.finY;
+            moveOnePlayer(1, players[1].ang);
         }
         if (buttons[83]) {
-            var ret = $('#p2').moveByVec(players[2].ang + 180, playerSpeed);
-            players[2]['x'] = ret.finX;
-            players[2]['y'] = ret.finY;
+            moveOnePlayer(2, players[2].ang + 180);
         }
         if (buttons[87]) {
-            var ret = $('#p2').moveByVec(players[2].ang, playerSpeed);
-            players[2]['x'] = ret.finX;
-            players[2]['y'] = ret.finY;
+            moveOnePlayer(2, players[2].ang);
         }
         if (buttons[98]) {
-            var ret = $('#p4').moveByVec(players[4].ang + 180, playerSpeed);
-            players[4]['x'] = ret.finX;
-            players[4]['y'] = ret.finY;
+            moveOnePlayer(3, players[3].ang + 180);
         }
         if (buttons[101]) {
-            var ret = $('#p4').moveByVec(players[4].ang, playerSpeed);
-            players[4]['x'] = ret.finX;
-            players[4]['y'] = ret.finY;
+            moveOnePlayer(3, players[3].ang);
         }
         if (buttons[75]) {
-            var ret = $('#p3').moveByVec(players[3].ang + 180, playerSpeed);
-            players[3]['x'] = ret.finX;
-            players[3]['y'] = ret.finY;
+            moveOnePlayer(4, players[4].ang + 180);
         }
         if (buttons[73]) {
-            var ret = $('#p3').moveByVec(players[3].ang, playerSpeed);
-            players[3]['x'] = ret.finX;
-            players[3]['y'] = ret.finY;
+            moveOnePlayer(4, players[4].ang);
         }
     }
 
@@ -228,6 +214,79 @@ function checkButtons() {
     }
 }
 
+function moveOnePlayer(player, ang) {
+    var ret = $('#p' + player).moveByVec(ang, playerSpeed, true);
+    var walls = checkWallPlCol(players[player]);
+    var moveX = true;
+    var moveY = true;
+    
+    if(walls['right']) {
+        if(ret.xAdd > 0) {
+            moveX = false;
+            if(player.x !== fieldWidth - playerSize) {
+                players[player].y = fieldWidth - playerSize;
+                $('#p' + player).y(players[player].x);
+            }
+        }
+    }
+    if(walls['left']) {
+        if(ret.xAdd < 0) {
+            moveX = false;
+            if(player.x !== 0) {
+                players[player].x = 0;
+                $('#p' + player).x(0);
+            }
+        }
+    }
+    if(walls['bottom']) {
+        if(ret.yAdd < 0) {
+            moveY = false;
+            if(player.y !== 0) {
+                players[player].y = 0;
+                $('#p' + player).y(0);
+            }
+        }
+    }
+    if(walls['top']) {
+        if(ret.yAdd > 0) {
+            moveY = false;
+            if(player.y !== fieldHeight - playerSize) {
+                players[player].y = fieldHeight - playerSize;
+                $('#p' + player).y(players[player].y);
+            }
+        }
+    }
+    
+    if(moveY) {
+        players[player].y = ret.finY;
+        $('#p' + player).y(ret.finY);
+    }
+    if(moveX) {
+        players[player].x = ret.finX;
+        $('#p' + player).x(ret.finX);
+    }
+}
+
+function checkWallPlCol(player) {
+    
+    var walls = {left: false, right: false, top: false, bottom: false};
+    
+    if(player.x <= 0) {
+        walls['left'] = true;
+    }
+    if(player.x + playerSize >= fieldWidth) {
+        walls['right'] = true;
+    }
+    if(player.y <= 0) {
+        walls['bottom'] = true;
+    }
+    if(player.y + playerSize>= fieldHeight) {
+        walls['top'] = true;
+    }
+    
+    return walls;
+}
+
 function fire(player) {
 
     var newBullet = {};
@@ -255,10 +314,13 @@ function fitToSize() {
 
     var x = window.innerWidth - 30;
     var y = window.innerHeight - 30;
-
+    
     field.height(y);
     field.width(x);
-
+    
+    fieldHeight = y;
+    fieldWidth = x;
+    
     fitToSizeJQbottom();
 
     $('#p2').x(x - playerSize);
