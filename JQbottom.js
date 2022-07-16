@@ -14,9 +14,11 @@ function fitToSizeJQbottom() {
     if (typeof bottom !== 'undefined') {
         offsetTop = fieldH - bottom - this[0].offsetHeight;
         this[0].style.top = offsetTop + 'px';
+        return this;
+    } else {
+        return offsetTop;
     }
     
-    return offsetTop;
   };
 })(jQuery);
 
@@ -28,9 +30,11 @@ function fitToSizeJQbottom() {
     if (typeof left !== 'undefined') {
         offsetLeft = left;
         this[0].style.left = offsetLeft + 'px';
+        return this;
+    } else {
+        return offsetLeft;
     }
     
-    return offsetLeft;
   };
 })(jQuery);
 
@@ -38,6 +42,7 @@ function fitToSizeJQbottom() {
     $.fn.rotate = function(ang) {
         if (typeof ang !== 'undefined') {
             this.css('transform', 'rotate(' + ang + 'deg)');
+            return this;
         } else {
             console.log('now getting rotation isn`t aviable');
             return;
@@ -46,7 +51,7 @@ function fitToSizeJQbottom() {
 })(jQuery);
 
 (function($) {
-    $.fn.moveByVec = function(ang, shift, fDontMove, angType) {
+    $.fn.moveByVec = function(ang, shift, fDontMove, fDontUseDat, angType) {
     
     if(angType !== 'rad') {
         ang = dToR(ang);
@@ -54,15 +59,41 @@ function fitToSizeJQbottom() {
     
     var obj = $('#' + this[0].id);
     
-    var xAdd = Math.cos((ang)) * shift;
-    var yAdd = -(Math.sin((ang)) * shift);
+    var xAdd = cos(ang) * shift;
+    var yAdd = -(sin(ang) * shift);
     
-    var finX = obj.x() + xAdd;
-    var finY = obj.y() + yAdd;
+    var currX = 0.00;
+    var currY = 0.00;
+    
+    if(!fDontUseDat) {
+        if(!isNaN(obj.data('x'))) {
+            currX = obj.data('x');
+        } else {
+        currX = obj.x();
+        currY = obj.y();
+        }
+        if(!isNaN(obj.data('y'))) {
+            currY = obj.data('y');
+        } else {
+        currX = obj.x();
+        currY = obj.y();
+        }
+    } else {
+        currX = obj.x();
+        currY = obj.y();
+    }
+    
+    var finX = currX + xAdd;
+    var finY = currY + yAdd;
     
     if(!fDontMove) {
         obj.x(finX);
         obj.y(finY);
+        
+        if(!fDontUseDat) {
+            obj.data('x', finX);
+            obj.data('y', finY);
+        }
     }
     
     var ret = {xAdd, yAdd, finX, finY};
@@ -100,4 +131,11 @@ function rToD(radians) {
 function dToR(degrees) {
     var pi = Math.PI;
     return degrees * (pi/180);
+}
+
+function log(value, string) {
+    if(string) {
+        value = JSON.stringify(value);
+    }
+    console.log(value);
 }

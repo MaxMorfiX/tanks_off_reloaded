@@ -8,12 +8,14 @@
     z-index: 0;
     display: block;
 }
-.player {
-    position: absolute;
-    width: 30px;
-    height: 30px;
-    background: url('textures/p1.png');
-    background-size: 100% 100% !important;
+.panel {
+    position: relative;
+    width: 500px;
+    height: 32px;
+    border: none;
+    color: #cccccc;
+    background-color: #cccccc;
+    z-index: 0;
     display: block;
 }
 .bullet {
@@ -25,6 +27,15 @@
     display: block;
     
 }
+
+.player {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background: url('textures/p1.png');
+    background-size: 100% 100% !important;
+    display: block;
+}
 #p2 {
     background: url('textures/p2.png');
     transform: rotate(180deg);
@@ -35,5 +46,42 @@
 #p4 {
     background: url('textures/p4.png');
     transform: rotate(180deg);
-    display: none;
+}
+
+.score {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    top: 1px;
+    text-align: center;
+    font-size: 26px;
+    color: black;
+}
+#p1sc {
+    background: url('textures/p1sc.png');
+    background-size: 100% 100%;
+}
+#p2sc {
+    background: url('textures/p2sc.png');
+    background-size: 100% 100%;
+}
+#p3sc {
+    background: url('textures/p3sc.png');
+    background-size: 100% 100%;
+}
+#p4sc {
+    background: url('textures/p4sc.png');
+    background-size: 100% 100%;
+}
+
+.settings {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    top: 1px;
+    background: url('textures/settings.png');
+}
+
+body {
+    margin: 0px;
 }

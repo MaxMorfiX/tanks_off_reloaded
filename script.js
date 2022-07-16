@@ -2,12 +2,14 @@ const SEP = '_';
 var playerSpeed = 3;
 var bulletSpeed = playerSpeed * 3;
 var field = $('#field');
+var panel = $('#panel');
 var fieldHeight = field.height();
 var fieldWidth = field.width();
 var playerSize = $('.player').innerWidth();
 var bulletSize = $('.bullet').innerWidth();
-var playPlayers = 3;
+var playPlayers = 4;
 var lastBulletId = 0;
+var spaceBetwSc = 1;
 
 $('#divForBulletSize').remove();
 
@@ -81,10 +83,11 @@ function bulletsPlayersColCheck() {
             }
 
             if (checkOnePlayerCol(player, bullet)) {
+                changeScore(bullet.player);
                 player.lives -= 1;
-                players[bullet.player].score += 1;
+                
 
-                console.log(bullet.player + '`s player bullet hit in ' + j + ' player');
+//                console.log(bullet.player + '`s player bullet hit in ' + j + ' player');
 
                 $('#bull' + bullet.id).remove();
                 bullets.splice(i, 1);
@@ -96,7 +99,11 @@ function bulletsPlayersColCheck() {
         }
     }
 }
-
+function changeScore(playerId) {
+    var player = players[playerId];
+    player.score += 1;
+    $('#p' + playerId + 'sc').text(player.score);
+}
 function bulletsWallColCheck() {
     for (i = 0; i < bullets.length; i++) {
 
@@ -111,7 +118,6 @@ function bulletsWallColCheck() {
         }
     }
 }
-
 function checkOnePlayerCol(player, bullet) {
     var pL = player.x;
     var pB = player.y;
@@ -188,16 +194,16 @@ function checkButtons() {
         if (buttons[87]) {
             moveOnePlayer(2, players[2].ang);
         }
-        if (buttons[98]) {
+        if (buttons[75]) {
             moveOnePlayer(3, players[3].ang + 180);
         }
-        if (buttons[101]) {
+        if (buttons[73]) {
             moveOnePlayer(3, players[3].ang);
         }
-        if (buttons[75]) {
+        if (buttons[98]) {
             moveOnePlayer(4, players[4].ang + 180);
         }
-        if (buttons[73]) {
+        if (buttons[101]) {
             moveOnePlayer(4, players[4].ang);
         }
     }
@@ -234,7 +240,21 @@ function checkButtons() {
         }
     }
 }
+function fire(player) {
 
+    var newBullet = {};
+    newBullet.ang = players[player].ang;
+    newBullet.player = player;
+    newBullet.id = ++lastBulletId;
+    newBullet.x = players[player].x + playerSize / 2 - bulletSize / 2;
+    newBullet.y = players[player].y + playerSize / 2 - bulletSize / 2;
+
+    create('bullet', newBullet);
+
+    bullets.push(newBullet);
+
+    $('#bull' + (newBullet.id)).moveByVec(players[player].ang, playerSize * 0.45);
+}
 function moveOnePlayer(player, ang) {
     var ret = $('#p' + player).moveByVec(ang, playerSpeed, true);
     var walls = checkWallPlCol(players[player]);
@@ -281,10 +301,12 @@ function moveOnePlayer(player, ang) {
     if(moveY) {
         players[player].y = ret.finY;
         $('#p' + player).y(ret.finY);
+        $('#p' + player).data('y', ret.finY);
     }
     if(moveX) {
         players[player].x = ret.finX;
         $('#p' + player).x(ret.finX);
+        $('#p' + player).data('x', ret.finX);
     }
 }
 
@@ -308,22 +330,6 @@ function checkWallPlCol(player) {
     return walls;
 }
 
-function fire(player) {
-
-    var newBullet = {};
-    newBullet.ang = players[player].ang;
-    newBullet.player = player;
-    newBullet.id = ++lastBulletId;
-    newBullet.x = players[player].x + playerSize / 2 - bulletSize / 2;
-    newBullet.y = players[player].y + playerSize / 2 - bulletSize / 2;
-
-    create('bullet', newBullet);
-
-    bullets.push(newBullet);
-
-    $('#bull' + (newBullet.id)).moveByVec(players[player].ang, playerSize * 0.45);
-}
-
 function create(type, newBullet) {
     if (type === 'bullet') {
         var html = `<div id='bull${newBullet.id}' class='bullet' style='left: ${newBullet.x}px; bottom: ${newBullet.y}px'></div>`;
@@ -333,14 +339,15 @@ function create(type, newBullet) {
 
 function fitToSize() {
 
-    var x = window.innerWidth - 30;
-    var y = window.innerHeight - 30;
+    var x = window.innerWidth - 0;
+    var y = window.innerHeight - 0;
     
-    field.height(y);
-    field.width(x);
-    
-    fieldHeight = y;
+    fieldHeight = y - panel.height();
     fieldWidth = x;
+    
+    field.height(fieldHeight);
+    field.width(x);
+    panel.width(x);
     
     fitToSizeJQbottom();
 
@@ -348,7 +355,16 @@ function fitToSize() {
     $('#p4').x(x - playerSize);
     $('#p3').y(0);
     $('#p4').y(0);
-
+    
+    $('#p1').data('y', fieldHeight - playerSize);
+    $('#p2').data('y', fieldHeight - playerSize).data('x', fieldWidth - playerSize);
+    $('#p4').data('x', fieldWidth - playerSize);
+    
+    $('#p3sc').x(x/2 + spaceBetwSc/2);
+    $('#p2sc').x(x/2 - $('#p2sc').width() - spaceBetwSc/2);
+    $('#p1sc').x($('#p2sc').x() - spaceBetwSc*2 - $('#p1sc').width());
+    $('#p4sc').x($('#p3sc').x() + spaceBetwSc + $('#p3sc').width());
+    
     for (i = 1; i <= 4; i++) {
         players[i].x = $('#p' + i).x();
         players[i].y = $('#p' + i).y();
