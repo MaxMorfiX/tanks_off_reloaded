@@ -6,6 +6,11 @@
     color: gray;
     background-color: gray;
     z-index: 0;
+    display: none;
+}
+#menuField {
+    z-index: 40;
+    padding: 5px;
     display: block;
 }
 .panel {
@@ -16,7 +21,18 @@
     color: #cccccc;
     background-color: #cccccc;
     z-index: 0;
-    display: block;
+    display: none;
+}
+.blur {
+    position: absolute;
+    width: 500px;
+    height: 332px;
+    border: none;
+    color: black;
+    background-color: black;
+    z-index: 2;
+    opacity: 50%;
+    display: none;
 }
 .bullet {
     position: absolute;
@@ -73,6 +89,12 @@
     background: url('textures/p4sc.png');
     background-size: 100% 100%;
 }
+#pause {
+    background: url('textures/pause.png');
+    background-size: 100% 100%;
+    z-index: 3;
+    display: none;
+}
 
 .settings {
     position: absolute;
@@ -80,6 +102,34 @@
     height: 30px;
     top: 1px;
     background: url('textures/settings.png');
+    background-size: 100% 100%;
+    z-index: 3;
+    display: none;
+}
+
+.play {
+    position: absolute;
+    width: 90px;
+    height: 90px;
+    z-index: 50;
+    background: url('textures/resume.png');
+    background-size: 100% 100%;
+}
+.pchoosers {
+    text-align: center;
+    font-size: 26px;
+    color: black;
+    top: 35px;
+}
+.text {
+    text-align: center;
+    font-size: 26px;
+    color: black;
+}
+.pchoosers, #pause, .settings:hover {cursor: pointer};
+
+.fixBg {
+    background-size: 100% 100%;
 }
 
 body {

@@ -39,18 +39,6 @@ function fitToSizeJQbottom() {
 })(jQuery);
 
 (function($) {
-    $.fn.rotate = function(ang) {
-        if (typeof ang !== 'undefined') {
-            this.css('transform', 'rotate(' + ang + 'deg)');
-            return this;
-        } else {
-            console.log('now getting rotation isn`t aviable');
-            return;
-        }
-  };
-})(jQuery);
-
-(function($) {
     $.fn.moveByVec = function(ang, shift, fDontMove, fDontUseDat, angType) {
     
     if(angType !== 'rad') {
@@ -101,6 +89,40 @@ function fitToSizeJQbottom() {
     return ret;
     
     };
+})(jQuery);
+
+(function($) {
+    $.fn.rotate = function(ang) {
+        if (typeof ang !== 'undefined') {
+            this.css('transform', 'rotate(' + ang + 'deg)');
+            return this;
+        } else {
+            console.log('now getting rotation isn`t aviable');
+            return;
+        }
+  };
+})(jQuery);
+(function($) {
+    $.fn.opacity = function(opacity) {
+        if (typeof opacity !== 'undefined') {
+            this[0].style.opacity = opacity;
+            
+            return this;
+        } else {
+            return this[0].style.opacity;
+        }
+  };
+})(jQuery);
+(function($) {
+    $.fn.placeholder = function(value) {
+        if (typeof value !== 'undefined') {
+            this[0].placeholder = value;
+            
+            return this;
+        } else {
+            return this[0].getAttribute("placeholder");
+        }
+  };
 })(jQuery);
 
 function cos(number) {

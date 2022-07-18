@@ -1,5 +1,6 @@
 const SEP = '_';
 var playerSpeed = 3;
+var playerRotateSpeed = 2.5;
 var bulletSpeed = playerSpeed * 3;
 var field = $('#field');
 var panel = $('#panel');
@@ -7,22 +8,23 @@ var fieldHeight = field.height();
 var fieldWidth = field.width();
 var playerSize = $('.player').innerWidth();
 var bulletSize = $('.bullet').innerWidth();
+$('#divForBulletSize').remove();
 var playPlayers = 4;
 var lastBulletId = 0;
 var spaceBetwSc = 1;
-
-$('#divForBulletSize').remove();
-
+var gamePlaying = false;
+var gamemode = 1;
 var timeBetweenBullets = 500;
 var gamespeed = 15;
 var buttons = {};
 var bullets = [];
 var players = {
-    1: {x: 0, y: 0, ang: 0, lastFire: timeBetweenBullets, lives: 10, score: 0},
-    2: {x: 0, y: 0, ang: 180, lastFire: timeBetweenBullets, lives: 10, score: 0},
-    3: {x: 0, y: 0, ang: 0, lastFire: timeBetweenBullets, lives: 10, score: 0},
-    4: {x: 0, y: 0, ang: 180, lastFire: timeBetweenBullets, lives: 10, score: 0}
+    1: {x: 0, y: 0, ang: 0, lastFire: timeBetweenBullets, lives: 10, score: 0, isAlive: true},
+    2: {x: 0, y: 0, ang: 180, lastFire: timeBetweenBullets, lives: 10, score: 0, isAlive: true},
+    3: {x: 0, y: 0, ang: 0, lastFire: timeBetweenBullets, lives: 10, score: 0, isAlive: true},
+    4: {x: 0, y: 0, ang: 180, lastFire: timeBetweenBullets, lives: 10, score: 0, isAlive: true}
 };
+var target = 10;
 
 document.addEventListener('keydown', KeyDown);
 document.addEventListener('keyup', KeyUp);
@@ -34,13 +36,64 @@ function KeyUp(e) {
     if (buttons[e.which]) {
         buttons[e.which] = false;
     }
+    if(e.which === 27) {
+        togglePause();
+    }
 }
 
 start();
 
 function start() {
     fitToSize();
+//    startGame();
+}
+
+function startGame() {
+    
+    $('#menuField').hide();
+    
+    if(gamemode === 3) {
+        for(i = 1; i <= 4; i++) {
+            players[i].lives = target;
+            $('#p' + i + 'sc').text(players[i].lives);
+        }
+    }
+    
+    field.show();
+    $('#pause').show();
+    $('#panel').show();
+    
+    for(i = 4; i > 0; i--) {
+        if(playPlayers < i) {
+            $('#p' + i).hide();
+        } else {
+            break;
+        }
+    }
+    
+    gamePlaying = true;
     cycle();
+}
+
+function togglePause() {
+    if(gamePlaying) {
+        gamePlaying = false;
+        $('#blur').show();
+        $('#settings').show();
+        $('#pause').css('background', 'url("textures/resume.png"').css('background-size', '100% 100%');    
+    } else {
+        $('#blur').hide();
+        $('#settings').hide();
+        $('#pause').css('background', 'url("textures/pause.png"').css('background-size', '100% 100%');
+        gamePlaying = true;
+        cycle();
+    }
+}
+function resume() {
+    gamePlaying = true;
+    $('#blur').hide();
+    $('#pause').css('background', 'url("textures/pause.png"').css('background-size', '100% 100%');
+    $('#pause').on('click', 'pause();');
 }
 
 function cycle() {
@@ -50,8 +103,10 @@ function cycle() {
     moveBullets();
 
     checkButtons();
-
-    setTimeout(cycle, gamespeed);
+    
+    if(gamePlaying) {
+        setTimeout(cycle, gamespeed);
+    }
 }
 
 function moveBullets() {
@@ -70,11 +125,15 @@ function hitboxCheck() {
 }
 
 function bulletsPlayersColCheck() {
-    for (j = 1; j <= playPlayers; j++) {
-
+    for (var j = 1; j <= playPlayers; j++) {
+        
         var player = players[j];
+        
+        if(!player.isAlive || j > playPlayers) {
+            continue;
+        }
 
-        for (i = 0; i < bullets.length; i++) {
+        for (var i = 0; i < bullets.length; i++) {
 
             var bullet = bullets[i];
 
@@ -83,27 +142,65 @@ function bulletsPlayersColCheck() {
             }
 
             if (checkOnePlayerCol(player, bullet)) {
-                changeScore(bullet.player);
                 player.lives -= 1;
                 
-
-//                console.log(bullet.player + '`s player bullet hit in ' + j + ' player');
-
+                if(gamemode === 3) {
+                    $('#p' + j + 'sc').text(player.lives);
+                    if(player.lives < 1) {
+                        player.isAlive = false;
+                        $('#p' + j).opacity(0.3);
+                        checkGameWin();
+                    }
+                } else {
+                    changeScore(bullet.player);
+                }
+                
                 $('#bull' + bullet.id).remove();
                 bullets.splice(i, 1);
+                i--;
+                
+//              console.log(bullet.player + '`s player bullet hit in ' + j + ' player');
+                
+                
                 // yep, this works as (i < bullets.length) condition is recalculated each loop.
                 // or we may just iterate backwards:
                 // for (i = bullets.length-1; i >= 0; i--) {
-                i--;
             }
         }
     }
 }
+
 function changeScore(playerId) {
     var player = players[playerId];
     player.score += 1;
-    $('#p' + playerId + 'sc').text(player.score);
+    if(gamemode === 3) {
+        return;
+    } else {
+        $('#p' + playerId + 'sc').text(player.score);
+        if(gamemode === 1 && player.score >= target) {
+            log('player ' + playerId + ' won the game!');
+        } else if(gamemode === 2) {
+            log('fuck off');
+        }
+    }
 }
+function checkGameWin() {
+    if(gamemode === 3) {
+        var aliveCount = 0;
+        var thatOne = 1;
+        for(var i = 1; i <= playPlayers; i++) {
+            if(!players[i].isAlive) {
+                continue;
+            }
+            thatOne = i;
+            aliveCount++;
+        }
+        if(aliveCount === 1) {
+            log('player ' + thatOne + ' won the game!');
+        }
+    }
+}
+
 function bulletsWallColCheck() {
     for (i = 0; i < bullets.length; i++) {
 
@@ -148,36 +245,51 @@ function checkButtons() {
 
     function checkRotButtons() {
         if (buttons[37]) {
-            players[1]['ang'] = players[1].ang - 3;
+            players[1]['ang'] = players[1].ang - playerRotateSpeed;
             $('#p1').rotate(players[1].ang);
         }
         if (buttons[39]) {
-            players[1]['ang'] = players[1].ang + 3;
+            players[1]['ang'] = players[1].ang + playerRotateSpeed;
             $('#p1').rotate(players[1].ang);
         }
+        
+        if(playPlayers <= 1) {
+            return;
+        }
+        
         if (buttons[65]) {
-            players[2]['ang'] = players[2].ang - 3;
+            players[2]['ang'] = players[2].ang - playerRotateSpeed;
             $('#p2').rotate(players[2].ang);
         }
         if (buttons[68]) {
-            players[2]['ang'] = players[2].ang + 3;
+            players[2]['ang'] = players[2].ang + playerRotateSpeed;
             $('#p2').rotate(players[2].ang);
         }
-        if (buttons[97]) {
-            players[4]['ang'] = players[4].ang - 3;
-            $('#p4').rotate(players[4].ang);
+        
+        if(playPlayers <= 2) {
+            return;
         }
-        if (buttons[99]) {
-            players[4]['ang'] = players[4].ang + 3;
-            $('#p4').rotate(players[4].ang);
-        }
+        
         if (buttons[74]) {
-            players[3]['ang'] = players[3].ang - 3;
+            players[3]['ang'] = players[3].ang - playerRotateSpeed;
             $('#p3').rotate(players[3].ang);
         }
         if (buttons[76]) {
-            players[3]['ang'] = players[3].ang + 3;
+            players[3]['ang'] = players[3].ang + playerRotateSpeed;
             $('#p3').rotate(players[3].ang);
+        }
+        
+        if(playPlayers <= 3) {
+            return;
+        }
+        
+        if (buttons[97]) {
+            players[4]['ang'] = players[4].ang - playerRotateSpeed;
+            $('#p4').rotate(players[4].ang);
+        }
+        if (buttons[99]) {
+            players[4]['ang'] = players[4].ang + playerRotateSpeed;
+            $('#p4').rotate(players[4].ang);
         }
     }
 
@@ -188,18 +300,33 @@ function checkButtons() {
         if (buttons[38]) {
             moveOnePlayer(1, players[1].ang);
         }
+        
+        if(playPlayers <= 1) {
+            return;
+        }
+        
         if (buttons[83]) {
             moveOnePlayer(2, players[2].ang + 180);
         }
         if (buttons[87]) {
             moveOnePlayer(2, players[2].ang);
         }
+        
+        if(playPlayers <= 2) {
+            return;
+        }
+        
         if (buttons[75]) {
             moveOnePlayer(3, players[3].ang + 180);
         }
         if (buttons[73]) {
             moveOnePlayer(3, players[3].ang);
         }
+        
+        if(playPlayers <= 3) {
+            return;
+        }
+        
         if (buttons[98]) {
             moveOnePlayer(4, players[4].ang + 180);
         }
@@ -213,26 +340,42 @@ function checkButtons() {
         for (i = 1; i <= 4; i++) {
             players[i]['lastFire'] += gamespeed;
         }
-
-        if (buttons[191]) {
+        
+        if (buttons[191] && players[1].isAlive) {
             if (players[1].lastFire >= timeBetweenBullets) {
                 players[1].lastFire = 0;
                 fire(1);
             }
         }
-        if (buttons[49]) {
+        
+        if(playPlayers <= 1) {
+            return;
+        }
+        
+        
+        if (buttons[49] && players[2].isAlive) {
             if (players[2].lastFire >= timeBetweenBullets) {
                 players[2].lastFire = 0;
                 fire(2);
             }
         }
-        if (buttons[32]) {
+        
+        if(playPlayers <= 2) {
+            return;
+        }
+        
+        if (buttons[32] && players[3].isAlive) {
             if (players[3].lastFire >= timeBetweenBullets) {
                 players[3].lastFire = 0;
                 fire(3);
             }
         }
-        if (buttons[13]) {
+        
+        if(playPlayers <= 3) {
+            return;
+        }
+        
+        if (buttons[13] && players[4].isAlive) {
             if (players[4].lastFire >= timeBetweenBullets) {
                 players[4].lastFire = 0;
                 fire(4);
@@ -337,10 +480,44 @@ function create(type, newBullet) {
     field.append(html);
 }
 
+function changePlayPlayers(count) {
+    playPlayers = count;
+    for(var i = 1; i <= 4; i++) {
+        if(i <= playPlayers) {
+            $('#p' + i + 'chooser').opacity(1);
+        } else {
+            $('#p' + i + 'chooser').opacity(0.3);
+            players[i].isAlive = false;
+        }
+    }
+}
+
+function changeGamemode(mode) {
+    $('#gamemode' + gamemode).opacity(0.3);
+    
+    gamemode = mode;
+    
+    $('#gamemode' + gamemode).opacity(1);
+    
+    if(gamemode === 1) {
+        $('#inputTarget').placeholder("at what maximum score a player'll win");
+    } else if(gamemode === 2) {
+        $('#inputTarget').placeholder("how much time game'll play");
+    } else if(gamemode === 3) {
+        $('#inputTarget').placeholder("how many lives every player'll have");
+    }
+}
+function setNewTargetNum() {
+    target = $('#inputTarget').val();
+}
+
 function fitToSize() {
 
     var x = window.innerWidth - 0;
     var y = window.innerHeight - 0;
+    
+    field.show();
+    panel.show();
     
     fieldHeight = y - panel.height();
     fieldWidth = x;
@@ -350,6 +527,12 @@ function fitToSize() {
     panel.width(x);
     
     fitToSizeJQbottom();
+    
+    $('#menuField').width(x).height(y);
+    
+    $('#blur').width(x).height(y);
+    
+    $('#pause').x(x - $('#pause').width() - spaceBetwSc);
 
     $('#p2').x(x - playerSize);
     $('#p4').x(x - playerSize);
@@ -369,4 +552,7 @@ function fitToSize() {
         players[i].x = $('#p' + i).x();
         players[i].y = $('#p' + i).y();
     }
+    
+    field.hide();
+    panel.hide();
 }

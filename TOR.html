@@ -7,13 +7,35 @@
 </head>
 
 <body>
-    
+    <div id='menuField' class='field'>
+        <div id="play" class="play" onclick="startGame();"></div>
+        
+        <div id="playerChooser" style="position: absolute; left: 100px;">
+            <div id="textPlayers" class="text" style="height: 30px;">PLAYERS:</div>
+            <div id="p1chooser" onclick='changePlayPlayers(1);' style="background: url('textures/p1sc.png'); background-size: 100% 100%;" class="score pchoosers">1</div>
+            <div id="p2chooser" onclick='changePlayPlayers(2);' style="background: url('textures/p2sc.png'); background-size: 100% 100%; left: 31px" class="score pchoosers">2</div>
+            <div id="p3chooser" onclick='changePlayPlayers(3);' style="background: url('textures/p3sc.png'); background-size: 100% 100%; left: 62px" class="score pchoosers">3</div>
+            <div id="p4chooser" onclick='changePlayPlayers(4);' style="background: url('textures/p4sc.png'); background-size: 100% 100%; left: 93px" class="score pchoosers">4</div>
+        </div>
+        
+        <div id="gameTargetChooser" style="position: absolute; top: 91px;">
+            <div id="textTarget" class="text" style="height: 30px;">TARGET TO WIN:</div>
+            <input id="inputTarget" type='number' onchange='setNewTargetNum();' placeholder="at what maximum score a player'll win" style='position: absolute; height: 30px; width: 250px; top: 31px;'>
+            <div id="gamemode1" onclick='changeGamemode(1);' style="width: 150px; background: url('textures/p1sc.png'); background-size: 100% 100%; top: 70px;" class="score">by max score</div>
+            <div id="gamemode2" onclick='changeGamemode(2);' style="opacity: 0.3; width: 150px; background: url('textures/p2sc.png'); background-size: 100% 100%; top: 101px;" class="score">by time</div>
+            <div id="gamemode3" onclick='changeGamemode(3);' style="opacity: 0.3; width: 150px; background: url('textures/p3sc.png'); background-size: 100% 100%; top: 132px;" class="score">by lives</div>
+        </div>
+    </div>
+    <div id="blur" class='blur'></div>
     <div id="panel" class="panel">
         <div id="p1sc" class="score">0</div>
         <div id="p2sc" class="score">0</div>
         <div id="p3sc" class="score">0</div>
         <div id="p4sc" class="score">0</div>
     </div>
+    
+    <div id="pause" class='score' onclick='togglePause();'></div>
+    <div id="settings" class='score' onclick='togglePause();'></div>
     
     <div id='field' class='field'>
         <div id="p4" class="player"></div>
