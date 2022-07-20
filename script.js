@@ -25,6 +25,9 @@ var players = {
     4: {x: 0, y: 0, ang: 180, lastFire: timeBetweenBullets, lives: 10, score: 0, isAlive: true}
 };
 var target = 10;
+var timer = 10.00;
+var addTime = false;
+var gameEnded = false;
 
 document.addEventListener('keydown', KeyDown);
 document.addEventListener('keyup', KeyUp);
@@ -45,12 +48,17 @@ start();
 
 function start() {
     fitToSize();
+    loadSettings();
 //    startGame();
 }
 
 function startGame() {
     
     $('#menuField').hide();
+    
+    field.show();
+    $('#pause').show();
+    $('#panel').show();
     
     if(gamemode === 3) {
         for(i = 1; i <= 4; i++) {
@@ -59,23 +67,34 @@ function startGame() {
         }
     }
     
-    field.show();
-    $('#pause').show();
-    $('#panel').show();
-    
     for(i = 4; i > 0; i--) {
         if(playPlayers < i) {
             $('#p' + i).hide();
+            $('#p' + i + 'sc').hide();
         } else {
             break;
         }
     }
+    
+    timer = target;
+    if(gamemode === 2) {
+        $('#timer').text('TIME LEFT: ' + timer);
+    } else {
+        $('#timer').hide();
+    }
+    
+    fitToSizeScore();
     
     gamePlaying = true;
     cycle();
 }
 
 function togglePause() {
+    
+    if(gameEnded) {
+        return;
+    }
+    
     if(gamePlaying) {
         gamePlaying = false;
         $('#blur').show();
@@ -98,6 +117,8 @@ function resume() {
 
 function cycle() {
 
+    checkGameWin();
+
     hitboxCheck();
 
     moveBullets();
@@ -106,6 +127,19 @@ function cycle() {
     
     if(gamePlaying) {
         setTimeout(cycle, gamespeed);
+        
+        timer = Math.floor((timer - gamespeed/1000)*100)/100;
+        
+        if(gamemode === 2) {
+            if(!addTime) {
+                
+                $('#timer').text('TIME LEFT: ' + timer);
+                
+                if(timer <= 0) {
+                    addTime = true;
+                }
+            }
+        }
     }
 }
 
@@ -122,6 +156,10 @@ function hitboxCheck() {
     bulletsPlayersColCheck();
     
     bulletsWallColCheck();
+    
+    if(bullets.length === 0 && addTime) {
+        checkGameWin(true);
+    }
 }
 
 function bulletsPlayersColCheck() {
@@ -177,14 +215,12 @@ function changeScore(playerId) {
         return;
     } else {
         $('#p' + playerId + 'sc').text(player.score);
-        if(gamemode === 1 && player.score >= target) {
-            log('player ' + playerId + ' won the game!');
-        } else if(gamemode === 2) {
-            log('fuck off');
+        if(!addTime && gamemode === 1 && player.score >= target) {
+            addTime = true;
         }
     }
 }
-function checkGameWin() {
+function checkGameWin(finalOperation) {
     if(gamemode === 3) {
         var aliveCount = 0;
         var thatOne = 1;
@@ -198,7 +234,36 @@ function checkGameWin() {
         if(aliveCount === 1) {
             log('player ' + thatOne + ' won the game!');
         }
+    } else if(finalOperation) {
+        if(timer <= 0) {
+            var maxSc = Math.max(players[1].score, players[2].score, players[3].score, players[4].score);
+            var winPlayers = [];
+            for(var i = 1; i <= playPlayers; i++) {
+                if(players[i].score === maxSc) {
+                    winPlayers.push(i);
+                }
+            }
+            if(winPlayers.length === playPlayers) {
+                gameWinMenu('dead heat - all players won the game!');
+            } else if(winPlayers.length === 1) {
+                gameWinMenu('player ' + winPlayers[0] + ' won the game!');
+            } else if(winPlayers.length === 2) {
+                gameWinMenu('player ' + winPlayers[0] + ' and player ' + winPlayers[1] + ' won the game!');
+            } else if(winPlayers.length === 3) {
+                gameWinMenu('players ' + winPlayers[0] + ', ' + winPlayers[1] + ' and ' + winPlayers[2] + ' won the game!');
+            }
+        }
     }
+}
+
+function gameWinMenu(text) {
+    gameEnded = true;
+    gamePlaying = false;
+    
+    $('#field, #pause, #panel').hide();
+    $('#gameWinMenu').text(text).css('text-aligin', 'center').show();
+    
+    log(text);
 }
 
 function bulletsWallColCheck() {
@@ -238,7 +303,11 @@ function checkOnePlayerCol(player, bullet) {
 }
 
 function checkButtons() {
-
+    
+    if(gameEnded) {
+        return;
+    }
+    
     checkRotButtons();
     checkMoveButtons();
     checkFire();
@@ -341,6 +410,10 @@ function checkButtons() {
             players[i]['lastFire'] += gamespeed;
         }
         
+        if(addTime) {
+            return;
+        }
+        
         if (buttons[191] && players[1].isAlive) {
             if (players[1].lastFire >= timeBetweenBullets) {
                 players[1].lastFire = 0;
@@ -351,7 +424,6 @@ function checkButtons() {
         if(playPlayers <= 1) {
             return;
         }
-        
         
         if (buttons[49] && players[2].isAlive) {
             if (players[2].lastFire >= timeBetweenBullets) {
@@ -490,6 +562,8 @@ function changePlayPlayers(count) {
             players[i].isAlive = false;
         }
     }
+    
+    saveSettings();
 }
 
 function changeGamemode(mode) {
@@ -502,22 +576,44 @@ function changeGamemode(mode) {
     if(gamemode === 1) {
         $('#inputTarget').placeholder("at what maximum score a player'll win");
     } else if(gamemode === 2) {
-        $('#inputTarget').placeholder("how much time game'll play");
+        $('#inputTarget').placeholder("how much time game'll play (seconds)");
     } else if(gamemode === 3) {
         $('#inputTarget').placeholder("how many lives every player'll have");
     }
+    
+    saveSettings();
 }
-function setNewTargetNum() {
+function setNewTargetNum(value) {
+    if(typeof value !== 'undefined') {
+        target = value;
+        $('#inputTarget').val(value);
+        return;
+    }
     target = $('#inputTarget').val();
+    
+    saveSettings();
 }
 
+function saveSettings() {
+   var settings = {  
+       gamemode, playPlayers, target
+   };
+    localStorage.setItem('settings', JSON.stringify(settings));
+}
+function loadSettings() {
+    var settings = JSON.parse(localStorage.getItem('settings'));
+    changeGamemode(settings.gamemode); 
+    setNewTargetNum(settings.target);
+    changePlayPlayers(settings.playPlayers);
+}
 function fitToSize() {
 
-    var x = window.innerWidth - 0;
-    var y = window.innerHeight - 0;
+    var x = window.innerWidth - 10;
+    var y = window.innerHeight - 10;
     
     field.show();
     panel.show();
+    $('#gameWinMenu').show();
     
     fieldHeight = y - panel.height();
     fieldWidth = x;
@@ -529,6 +625,8 @@ function fitToSize() {
     fitToSizeJQbottom();
     
     $('#menuField').width(x).height(y);
+    
+    $('#gameWinMenu').width(x);
     
     $('#blur').width(x).height(y);
     
@@ -553,6 +651,19 @@ function fitToSize() {
         players[i].y = $('#p' + i).y();
     }
     
+    $('#gameWinMenu').hide();
     field.hide();
     panel.hide();
+}
+function fitToSizeScore() {
+    if(playPlayers === 1) {
+        $('#p1sc').x(fieldWidth/2 - $('#p1sc').width()/2);
+    } else if(playPlayers === 2) {
+        $('#p2sc').x(fieldWidth/2 + spaceBetwSc/2);
+        $('#p1sc').x(fieldWidth/2 - $('#p1sc').width() - spaceBetwSc/2);
+    } else if(playPlayers === 3) {
+        $('#p2sc').x(fieldWidth/2 - $('#p2sc').width()/2);
+        $('#p1sc').x($('#p2sc').x() - spaceBetwSc - $('#p1sc').width());
+        $('#p3sc').x($('#p2sc').x() + spaceBetwSc + $('#p2sc').width());
+    }
 }

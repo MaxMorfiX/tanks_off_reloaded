@@ -89,11 +89,22 @@
     background: url('textures/p4sc.png');
     background-size: 100% 100%;
 }
+
 #pause {
     background: url('textures/pause.png');
     background-size: 100% 100%;
     z-index: 3;
     display: none;
+}
+
+.timer {
+    position: absolute;
+    width: 300px;
+    height: 30px;
+    top: 1px;
+    text-align: left;
+    font-size: 26px;
+    color: black;
 }
 
 .settings {
@@ -126,7 +137,15 @@
     font-size: 26px;
     color: black;
 }
-.pchoosers, #pause, .settings:hover {cursor: pointer};
+.pchoosers, #pause, .settings, #gamemode1, #gamemode2, #gamemode3:hover {cursor: pointer};
+
+.gameWin {
+    width: 500px;
+    height: 300px;
+    text-align: center;
+    font-size: 40px;
+    color: black;
+}
 
 .fixBg {
     background-size: 100% 100%;
