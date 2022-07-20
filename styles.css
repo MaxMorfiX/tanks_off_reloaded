@@ -137,12 +137,12 @@
     font-size: 26px;
     color: black;
 }
-.pchoosers, #pause, #play, .settings, #gamemode1, #gamemode2, #gamemode3:hover {cursor: pointer};
-
+.pchoosers, #pause, #play, .settings, #gamemode1, #gamemode2, #gamemode3:hover {cursor: pointer}
 .menuButton {
     position: absolute;
     width: 90px;
     height: 90px;
+    z-index: 40;
 } 
 #menu {
     background: url('textures/menu.png');

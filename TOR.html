@@ -35,11 +35,11 @@
         <div id="p3sc" class="score">0</div>
         <div id="p4sc" class="score">0</div>
     </div>
-    <div id='pauseMenu' style='position: absolute; top: 0;'>
+    <div id='pauseMenu' style='position: absolute; top: 0; z-index: 40;'>
         <div id="pause" class='score' onclick='togglePause();'></div>
         <div id="resume" class='menuButton' onclick='togglePause();'></div>
         <div id='menu' class='menuButton'></div>
-        <div id='restart' class='menuButton'></div>
+        <div id='restart' class='menuButton' onclick='restartGame();'></div>
     </div>
     <div id="settings" class='score' onclick='togglePause();'></div>
     

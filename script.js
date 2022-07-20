@@ -25,7 +25,7 @@ var players = {
     4: {x: 0, y: 0, ang: 180, lastFire: timeBetweenBullets, lives: 10, score: 0, isAlive: true}
 };
 var target = 10;
-var timer = 10.00;
+var timer = target;
 var addTime = false;
 var gameEnded = false;
 
@@ -85,7 +85,25 @@ function startGame() {
     
     fitToSizeScore();
     
+    $('#p1').x(0).y(fieldHeight - playerSize);
+    $('#p2').x(fieldWidth - playerSize).y(fieldHeight - playerSize);
+    $('#p3').x(0).y(0);
+    $('#p4').x(fieldWidth - playerSize).y(0);
+    
+    $('#p1').data('y', fieldHeight - playerSize).rotate(0).data('x', 0);
+    $('#p2').data('y', fieldHeight - playerSize).data('x', fieldWidth - playerSize).rotate(180);
+    $('#p4').data('x', fieldWidth - playerSize).rotate(180).data('y', 0);
+    $('#p4').data('x', 0).rotate(0).data('y', 0);
+    
+    for (i = 1; i <= 4; i++) {
+        players[i].x = $('#p' + i).x();
+        players[i].y = $('#p' + i).y();
+    }
+    
     gamePlaying = true;
+    gameEnded = false;
+    addTime = false;
+    
     cycle();
 }
 
@@ -108,9 +126,29 @@ function togglePause() {
 }
 function resume() {
     gamePlaying = true;
-    $('#blur').hide();
+    $('#blur, #resume, #restart, #menu').hide();
     $('#pause').css('background', 'url("textures/pause.png"').css('background-size', '100% 100%');
-    $('#pause').on('click', 'pause();');
+}
+
+function restartGame() {
+    lastBulletId = 0;
+    gameEnded = false;
+    addTime = false;
+    buttons = {};
+    bullets = [];
+    timer = target;
+    players = {
+    1: {x: 0, y: 0, ang: 0, lastFire: timeBetweenBullets, lives: target, score: 0, isAlive: true},
+    2: {x: 0, y: 0, ang: 180, lastFire: timeBetweenBullets, lives: target, score: 0, isAlive: true},
+    3: {x: 0, y: 0, ang: 0, lastFire: timeBetweenBullets, lives: target, score: 0, isAlive: true},
+    4: {x: 0, y: 0, ang: 180, lastFire: timeBetweenBullets, lives: target, score: 0, isAlive: true}};
+    
+    $('#blur, #resume, #restart, #menu').hide();
+    $('#pause').css('background', 'url("textures/pause.png"').css('background-size', '100% 100%');
+    
+    $('.bullet').remove();
+    
+    setTimeout(startGame, gamespeed + 2);
 }
 
 function cycle() {
@@ -656,7 +694,7 @@ function fitToSize() {
         players[i].y = $('#p' + i).y();
     }
     
-    $('#gameWinMenu, #menu, #restart').hide();
+    $('#gameWinMenu, #pauseMenu, #menu, #restart, #resume').hide();
     field.hide();
     panel.hide();
 }
