@@ -57,7 +57,7 @@ function startGame() {
     $('#menuField').hide();
     
     field.show();
-    $('#pause').show();
+    $('#pause, #pauseMenu').show();
     $('#panel').show();
     
     if(gamemode === 3) {
@@ -97,12 +97,10 @@ function togglePause() {
     
     if(gamePlaying) {
         gamePlaying = false;
-        $('#blur').show();
-        $('#settings').show();
+        $('#blur, #restart, #menu, #resume, #settings').show();
         $('#pause').css('background', 'url("textures/resume.png"').css('background-size', '100% 100%');    
     } else {
-        $('#blur').hide();
-        $('#settings').hide();
+        $('#blur, #restart, #menu, #resume, #settings').hide();
         $('#pause').css('background', 'url("textures/pause.png"').css('background-size', '100% 100%');
         gamePlaying = true;
         cycle();
@@ -631,7 +629,11 @@ function fitToSize() {
     
     $('#gameWinMenu').width(x);
     
-    $('#blur').width(x).height(y);
+    $('#restart').x(x/2 - $('#restart').width()).y(y/2 - $('#restart').height());
+    $('#menu').x($('#restart').x() - spaceBetwSc*5 - $('#menu').width()).y(y/2 - $('#menu').height());
+    $('#resume').x($('#restart').x() + spaceBetwSc*5 + $('#restart').width()).y(y/2 - $('#menu').height());
+    
+    $('#blur, #pauseMenu').width(x).height(y);
     
     $('#pause').x(x - $('#pause').width() - spaceBetwSc);
 
@@ -654,7 +656,7 @@ function fitToSize() {
         players[i].y = $('#p' + i).y();
     }
     
-    $('#gameWinMenu').hide();
+    $('#gameWinMenu, #menu, #restart').hide();
     field.hide();
     panel.hide();
 }

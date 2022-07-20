@@ -137,7 +137,25 @@
     font-size: 26px;
     color: black;
 }
-.pchoosers, #pause, .settings, #gamemode1, #gamemode2, #gamemode3:hover {cursor: pointer};
+.pchoosers, #pause, #play, .settings, #gamemode1, #gamemode2, #gamemode3:hover {cursor: pointer};
+
+.menuButton {
+    position: absolute;
+    width: 90px;
+    height: 90px;
+} 
+#menu {
+    background: url('textures/menu.png');
+    background-size: 100% 100%;
+}
+#restart {
+    background: url('textures/restart.png');
+    background-size: 100% 100%;
+}
+#resume {
+    background: url('textures/resume.png');
+    background-size: 100% 100%;
+}
 
 .gameWin {
     width: 500px;
