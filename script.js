@@ -137,6 +137,7 @@ function cycle() {
                 
                 if(timer <= 0) {
                     addTime = true;
+                    field.css('filter', 'grayscale(30%)');
                 }
             }
         }
@@ -217,6 +218,7 @@ function changeScore(playerId) {
         $('#p' + playerId + 'sc').text(player.score);
         if(!addTime && gamemode === 1 && player.score >= target) {
             addTime = true;
+            field.css('filter', 'grayscale(30%)');
         }
     }
 }
@@ -232,7 +234,7 @@ function checkGameWin(finalOperation) {
             aliveCount++;
         }
         if(aliveCount === 1) {
-            log('player ' + thatOne + ' won the game!');
+            gameWinMenu('player ' + thatOne + ' won the game!');
         }
     } else if(finalOperation) {
         if(timer <= 0) {
@@ -260,6 +262,7 @@ function gameWinMenu(text) {
     gameEnded = true;
     gamePlaying = false;
     
+    field.css('filter', 'none');
     $('#field, #pause, #panel').hide();
     $('#gameWinMenu').text(text).css('text-aligin', 'center').show();
     
