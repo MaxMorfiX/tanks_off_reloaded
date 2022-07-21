@@ -54,16 +54,19 @@ function start() {
 
 function startGame() {
     
-    $('#menuField').hide();
+    $('#menuField, #gameWinMenu').hide();
     
     field.show();
     $('#pause, #pauseMenu').show();
     $('#panel').show();
     
-    if(gamemode === 3) {
-        for(i = 1; i <= 4; i++) {
-            players[i].lives = target;
+    for(i = 1; i <= 4; i++) {
+        players[i].lives = target;
+        players[i].score = 0;
+        if(gamemode === 3) {
             $('#p' + i + 'sc').text(players[i].lives);
+        } else {
+            $('#p' + i + 'sc').text(players[i].score);
         }
     }
     
@@ -79,16 +82,22 @@ function startGame() {
     timer = target;
     if(gamemode === 2) {
         $('#timer').text('TIME LEFT: ' + timer);
+        $('#timer').show();
     } else {
         $('#timer').hide();
     }
     
     fitToSizeScore();
     
-    $('#p1').x(0).y(fieldHeight - playerSize);
-    $('#p2').x(fieldWidth - playerSize).y(fieldHeight - playerSize);
-    $('#p3').x(0).y(0);
-    $('#p4').x(fieldWidth - playerSize).y(0);
+    $('#restart, #menu').show();
+    $('#restart').x(fieldWidth/2 - $('#restart').width()/2);
+    $('#menu').x($('#restart').x() - spaceBetwSc*6 - $('#menu').width());
+    $('#restart, #menu').hide();
+    
+    $('#p1').x(0).y(fieldHeight - playerSize).opacity(1);
+    $('#p2').x(fieldWidth - playerSize).y(fieldHeight - playerSize).opacity(1);
+    $('#p3').x(0).y(0).opacity(1).data('x', 0).data('y', 0).rotate(0);
+    $('#p4').x(fieldWidth - playerSize).y(0).opacity(1);
     
     $('#p1').data('y', fieldHeight - playerSize).rotate(0).data('x', 0);
     $('#p2').data('y', fieldHeight - playerSize).data('x', fieldWidth - playerSize).rotate(180);
@@ -132,7 +141,29 @@ function resume() {
 
 function restartGame() {
     lastBulletId = 0;
-    gameEnded = false;
+    gameEnded = true;
+    addTime = false;
+    buttons = {};
+    bullets = [];
+    timer = target;
+    players = {
+    1: {x: 0, y: 0, ang: 0, lastFire: timeBetweenBullets, lives: target, score: 0, isAlive: true},
+    2: {x: 0, y: 0, ang: 180, lastFire: timeBetweenBullets, lives: target, score: 0, isAlive: true},
+    3: {x: 0, y: 0, ang: 0, lastFire: timeBetweenBullets, lives: target, score: 0, isAlive: true},
+    4: {x: 0, y: 0, ang: 180, lastFire: timeBetweenBullets, lives: target, score: 0, isAlive: true}};
+
+    field.css('filter', 'none');
+    
+    $('#blur, #resume, #restart, #menu').hide();
+    $('#pause').css('background', 'url("textures/pause.png"').css('background-size', '100% 100%');
+    
+    $('.bullet').remove();
+    
+    setTimeout(startGame, gamespeed + 2);
+}
+function goToMenu() {
+    lastBulletId = 0;
+    gameEnded = true;
     addTime = false;
     buttons = {};
     bullets = [];
@@ -143,12 +174,12 @@ function restartGame() {
     3: {x: 0, y: 0, ang: 0, lastFire: timeBetweenBullets, lives: target, score: 0, isAlive: true},
     4: {x: 0, y: 0, ang: 180, lastFire: timeBetweenBullets, lives: target, score: 0, isAlive: true}};
     
-    $('#blur, #resume, #restart, #menu').hide();
-    $('#pause').css('background', 'url("textures/pause.png"').css('background-size', '100% 100%');
-    
     $('.bullet').remove();
+    $('#pause').css('background', 'url("textures/pause.png"').css('background-size', '100% 100%');
+    $('#blur, #resume, #restart, #menu, #field, #panel, #pause, #pauseMenu, #gameWinMenu').hide();
     
-    setTimeout(startGame, gamespeed + 2);
+    $('#menuField').show();
+    
 }
 
 function cycle() {
@@ -300,7 +331,11 @@ function gameWinMenu(text) {
     
     field.css('filter', 'none');
     $('#field, #pause, #panel').hide();
-    $('#gameWinMenu').text(text).css('text-aligin', 'center').show();
+    $('#gameWinMenu').text(text).css('text-aligin', 'center');
+    $('#gameWinMenu, #restart, #menu').show();
+    
+    $('#restart').x(fieldWidth/2 + spaceBetwSc*3);
+    $('#menu').x($('#restart').x() - spaceBetwSc*3 - $('#menu').width());
     
     log(text);
 }
@@ -667,9 +702,9 @@ function fitToSize() {
     
     $('#gameWinMenu').width(x);
     
-    $('#restart').x(x/2 - $('#restart').width()).y(y/2 - $('#restart').height());
-    $('#menu').x($('#restart').x() - spaceBetwSc*5 - $('#menu').width()).y(y/2 - $('#menu').height());
-    $('#resume').x($('#restart').x() + spaceBetwSc*5 + $('#restart').width()).y(y/2 - $('#menu').height());
+    $('#restart').x(x/2 - $('#restart').width()/2).y(y/2 - $('#restart').height());
+    $('#menu').x($('#restart').x() - spaceBetwSc*6 - $('#menu').width()).y(y/2 - $('#menu').height());
+    $('#resume').x($('#restart').x() + spaceBetwSc*6 + $('#restart').width()).y(y/2 - $('#menu').height());
     
     $('#blur, #pauseMenu').width(x).height(y);
     
