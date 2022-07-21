@@ -45,6 +45,8 @@ function KeyUp(e) {
         if(!gameEnded) {
             togglePause(true);
             return;
+        } if(addTime) {
+            return;
         }
         startGame();
     }
