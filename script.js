@@ -27,7 +27,7 @@ var players = {
 var target = 10;
 var timer = target;
 var addTime = false;
-var gameEnded = false;
+var gameEnded = true;
 
 document.addEventListener('keydown', KeyDown);
 document.addEventListener('keyup', KeyUp);
@@ -41,6 +41,12 @@ function KeyUp(e) {
     }
     if(e.which === 27) {
         togglePause();
+    } else if(e.which === 13) {
+        if(!gameEnded) {
+            togglePause(true);
+            return;
+        }
+        startGame();
     }
 }
 
@@ -116,13 +122,18 @@ function startGame() {
     cycle();
 }
 
-function togglePause() {
+function togglePause(enterButton) {
     
     if(gameEnded) {
         return;
     }
     
     if(gamePlaying) {
+        
+        if(enterButton) {
+            return;
+        }
+        
         gamePlaying = false;
         $('#blur, #restart, #menu, #resume, #settings').show();
         $('#pause').css('background', 'url("textures/resume.png"').css('background-size', '100% 100%');    
