@@ -25,7 +25,18 @@
             <div id="gamemode1" onclick='changeGamemode(1);' style="width: 150px; background: url('textures/p1sc.png'); background-size: 100% 100%; top: 70px;" class="score">by max score</div>
             <div id="gamemode2" onclick='changeGamemode(2);' style="opacity: 0.3; width: 150px; background: url('textures/p2sc.png'); background-size: 100% 100%; top: 101px;" class="score">by time</div>
             <div id="gamemode3" onclick='changeGamemode(3);' style="opacity: 0.3; width: 150px; background: url('textures/p3sc.png'); background-size: 100% 100%; top: 132px;" class="score">by lives</div>
+            
+            <div id='fAddTimeChooser' style="position: absolute; left: 151px; top: 70px;">
+                <div id='fAddTimeChooserText' class="text" style='padding-left: 5px; text-align: left; width: 300px;'>give bonus time?</div>
+                <input type="radio" id="fAddTimeChoosertrue" onclick='changeFAddTime(true);' name="timeChooser" value="yes" style='position: absolute; top: 27px; width: 29px; height: 29px;' checked>
+                <div style='position: absolute; left: 34px; top: 27px; width: 70px; color: black; font-size: 27px; padding: 1px;'>yes</div>
+                <input type="radio" id="fAddTimeChooserfalse" onclick='changeFAddTime(false);' name="timeChooser" value="no" style='position: absolute; left: 0px; top: 57px; width: 29px; height: 29px;'>
+                <div style='position: absolute; left: 34px; top: 57px; width: 70px; color: black; font-size: 27px; padding: 1px;'>no</div>
+            </div>
         </div>
+        
+        <div id='settingsButton'></div>
+        
     </div>
     <div id="blur" class='blur'></div>
     <div id="panel" class="panel">
@@ -41,7 +52,7 @@
         <div id='menu' class='menuButton' onclick='goToMenu();'></div>
         <div id='restart' class='menuButton' onclick='restartGame();'></div>
     </div>
-    <div id="settings" class='score' onclick='togglePause();'></div>
+    
     
     <div id='field' class='field'>
         <div id="p4" class="player"></div>

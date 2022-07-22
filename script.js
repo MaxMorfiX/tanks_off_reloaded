@@ -26,6 +26,7 @@ var players = {
 };
 var target = 10;
 var timer = target;
+var fAddTime = true;
 var addTime = false;
 var gameEnded = true;
 
@@ -110,7 +111,7 @@ function startGame() {
     $('#p1').data('y', fieldHeight - playerSize).rotate(0).data('x', 0);
     $('#p2').data('y', fieldHeight - playerSize).data('x', fieldWidth - playerSize).rotate(180);
     $('#p4').data('x', fieldWidth - playerSize).rotate(180).data('y', 0);
-    $('#p4').data('x', 0).rotate(0).data('y', 0);
+    $('#p4').data('x', 0).rotate(180).data('y', 0);
     
     for (i = 1; i <= 4; i++) {
         players[i].x = $('#p' + i).x();
@@ -156,7 +157,6 @@ function restartGame() {
     lastBulletId = 0;
     gameEnded = true;
     addTime = false;
-    buttons = {};
     bullets = [];
     timer = target;
     players = {
@@ -217,7 +217,13 @@ function cycle() {
                 
                 if(timer <= 0) {
                     addTime = true;
-                    field.css('filter', 'grayscale(30%)');
+                    
+                    if(fAddTime) {
+                        field.css('filter', 'grayscale(30%)');
+                        return;
+                    }
+                    bullets = [];
+                    $('.bullet').remove();
                 }
             }
         }
@@ -298,7 +304,13 @@ function changeScore(playerId) {
         $('#p' + playerId + 'sc').text(player.score);
         if(!addTime && gamemode === 1 && player.score >= target) {
             addTime = true;
-            field.css('filter', 'grayscale(30%)');
+            
+            if(fAddTime) {
+                field.css('filter', 'grayscale(30%)');
+                return;
+            }
+            bullets = [];
+            $('.bullet').remove();
         }
     }
 }
@@ -652,7 +664,6 @@ function changePlayPlayers(count) {
     
     saveSettings();
 }
-
 function changeGamemode(mode) {
     $('#gamemode' + gamemode).opacity(0.3);
     
@@ -662,10 +673,13 @@ function changeGamemode(mode) {
     
     if(gamemode === 1) {
         $('#inputTarget').placeholder("at what maximum score a player'll win");
+        $('#fAddTimeChooser').show();
     } else if(gamemode === 2) {
         $('#inputTarget').placeholder("how much time game'll play (seconds)");
+        $('#fAddTimeChooser').show();
     } else if(gamemode === 3) {
         $('#inputTarget').placeholder("how many lives every player'll have");
+        $('#fAddTimeChooser').hide();
     }
     
     saveSettings();
@@ -680,16 +694,26 @@ function setNewTargetNum(value) {
     
     saveSettings();
 }
+function changeFAddTime(value) {
+    fAddTime = value;
+    
+    saveSettings();
+}
 
 function saveSettings() {
    var settings = {  
-       gamemode, playPlayers, target
+       gamemode, playPlayers, target, fAddTime
    };
     localStorage.setItem('settings', JSON.stringify(settings));
 }
 function loadSettings() {
     var settings = JSON.parse(localStorage.getItem('settings'));
-    changeGamemode(settings.gamemode); 
+    
+    fAddTime = settings.fAddTime;
+    
+    $("#fAddTimeChooser" + fAddTime).prop("checked", true);
+    
+    changeGamemode(settings.gamemode);
     setNewTargetNum(settings.target);
     changePlayPlayers(settings.playPlayers);
 }
@@ -711,9 +735,7 @@ function fitToSize() {
     
     fitToSizeJQbottom();
     
-    $('#menuField').width(x).height(y);
-    
-    $('#gameWinMenu').width(x);
+    $('#menuField, #gameWinMenu').width(x).height(y);
     
     $('#restart').x(x/2 - $('#restart').width()/2).y(y/2 - $('#restart').height());
     $('#menu').x($('#restart').x() - spaceBetwSc*6 - $('#menu').width()).y(y/2 - $('#menu').height());
