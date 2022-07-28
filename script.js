@@ -15,7 +15,9 @@ var spaceBetwSc = 1;
 var gamePlaying = false;
 var gamemode = 1;
 var timeBetweenBullets = 500;
-var gamespeed = 15;
+var fps = 60;
+var speedhack = 1;
+var gamespeed = 0.1666666666666666;
 var buttons = {};
 var bullets = [];
 var players = {
@@ -47,6 +49,7 @@ function KeyUp(e) {
             togglePause(true);
             return;
         } if(addTime) {
+            goToMenu();
             return;
         }
         startGame();
@@ -62,6 +65,14 @@ function start() {
 }
 
 function startGame() {
+    
+    gamespeedWithoutSpeedHack = 1000/fps;
+    
+    playerSpeed = 180/fps;
+    playerRotateSpeed = 160/fps;
+    bulletSpeed = playerSpeed * 3;
+    
+    gamespeed = gamespeedWithoutSpeedHack/speedhack;
     
     $('#menuField, #gameWinMenu').hide();
     
@@ -231,9 +242,9 @@ function cycle() {
 }
 
 function moveBullets() {
-    for (i = 0; i < bullets.length; i++) {
+    for (var i = 0; i < bullets.length; i++) {
         var bullet = bullets[i];
-        var ret = $('#bull' + bullet.id).moveByVec(bullet.ang, bulletSpeed);
+        var ret = $('#bull' + bullet.id).moveByVec(bullet.ang, bulletSpeed, fDontUseDat = false);
         bullet.x = ret.finX;
         bullet.y = ret.finY;
     }
@@ -506,7 +517,7 @@ function checkButtons() {
     function checkFire() {
 
         for (i = 1; i <= 4; i++) {
-            players[i]['lastFire'] += gamespeed;
+            players[i]['lastFire'] += gamespeedWithoutSpeedHack;
         }
         
         if(addTime) {
@@ -563,9 +574,11 @@ function fire(player) {
     newBullet.x = players[player].x + playerSize / 2 - bulletSize / 2;
     newBullet.y = players[player].y + playerSize / 2 - bulletSize / 2;
 
-    create('bullet', newBullet);
-
     bullets.push(newBullet);
+    
+    create('bullet', newBullet);
+    
+    $('#bull' + (newBullet.id)).data('x', newBullet.x).data('y', newBullet.y);
 
     $('#bull' + (newBullet.id)).moveByVec(players[player].ang, playerSize * 0.45);
 }
@@ -699,10 +712,23 @@ function changeFAddTime(value) {
     
     saveSettings();
 }
+function changeFPS(value) {
+    if(typeof value !== 'undefined') {
+        fps = value;
+    } else {
+        if(fps < 180) {
+            fps += 10;
+        } else {
+            fps = 20;
+        }
+    }
+    $('#fpschooser').val('FPS: ' + fps);
+    saveSettings();
+}
 
 function saveSettings() {
    var settings = {  
-       gamemode, playPlayers, target, fAddTime
+       gamemode, playPlayers, target, fAddTime, fps
    };
     localStorage.setItem('settings', JSON.stringify(settings));
 }
@@ -710,9 +736,9 @@ function loadSettings() {
     var settings = JSON.parse(localStorage.getItem('settings'));
     
     fAddTime = settings.fAddTime;
-    
     $("#fAddTimeChooser" + fAddTime).prop("checked", true);
     
+    changeFPS(settings.fps);
     changeGamemode(settings.gamemode);
     setNewTargetNum(settings.target);
     changePlayPlayers(settings.playPlayers);

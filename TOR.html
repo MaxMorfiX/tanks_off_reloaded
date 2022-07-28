@@ -4,6 +4,7 @@
 <head>
     <title>Tanks off reloaded</title>
     <link rel="stylesheet" type="text/css" href="styles.css"/>
+    <link href="styles.css" rel="stylesheet" type="text/css"/>
 </head>
 
 <body>
@@ -17,6 +18,7 @@
             <div id="p2chooser" onclick='changePlayPlayers(2);' style="background: url('textures/p2sc.png'); background-size: 100% 100%; left: 31px" class="score pchoosers">2</div>
             <div id="p3chooser" onclick='changePlayPlayers(3);' style="background: url('textures/p3sc.png'); background-size: 100% 100%; left: 62px" class="score pchoosers">3</div>
             <div id="p4chooser" onclick='changePlayPlayers(4);' style="background: url('textures/p4sc.png'); background-size: 100% 100%; left: 93px" class="score pchoosers">4</div>
+            <input id="fpschooser" value='FPS: 60' type='button' onclick='changeFPS();' style="position: absolute; top: 0px; left: 130px;">
         </div>
         
         <div id="gameTargetChooser" style="position: absolute; top: 91px;">
