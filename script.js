@@ -352,6 +352,11 @@ function checkGameWin(finalOperation) {
         }
     } else if(finalOperation) {
         if(timer <= 0) {
+            timer = 0;
+            $('#timer').text('TIME LEFT: ' + timer);
+            
+            addTime = true;
+            
             var maxSc = Math.max(players[1].score, players[2].score, players[3].score, players[4].score);
             var winPlayers = [];
             for(var i = 1; i <= playPlayers; i++) {
