@@ -15,6 +15,7 @@ var spaceBetwSc = 1;
 var gamePlaying = false;
 var gamemode = 1;
 var timeBetweenBullets = 500;
+var dynamicChangeFps = true;
 var fps = 60;
 var speedhack = 1;
 var gamespeed = 0.1666666666666666;
@@ -238,6 +239,16 @@ function cycle() {
                 }
             }
         }
+        
+        if(dynamicChangeFps) {
+            gamespeedWithoutSpeedHack = 1000/fps;
+    
+            playerSpeed = 180/fps;
+            playerRotateSpeed = 160/fps;
+            bulletSpeed = playerSpeed * 3;
+
+            gamespeed = gamespeedWithoutSpeedHack/speedhack;
+        }
     }
 }
 
@@ -381,10 +392,10 @@ function bulletsWallColCheck() {
 
         var bullet = bullets[i];
         
-        if(bullet.x <= 0 || bullet.x >= fieldWidth - bulletSize) {
+        if(bullet.x <= 0 - bulletSize || bullet.x >= fieldWidth) {
             $('#bull' + bullet.id).remove();
             bullets.splice(i, 1);
-        } else if(bullet.y <= 0 || bullet.y >= fieldHeight - bulletSize) {
+        } else if(bullet.y <= 0 - bulletSize || bullet.y >= fieldHeight - bulletSize) {
             $('#bull' + bullet.id).remove();
             bullets.splice(i, 1);
         }
@@ -745,8 +756,8 @@ function loadSettings() {
 }
 function fitToSize() {
 
-    var x = window.innerWidth - 10;
-    var y = window.innerHeight - 10;
+    var x = window.innerWidth;
+    var y = window.innerHeight;
     
     field.show();
     panel.show();
